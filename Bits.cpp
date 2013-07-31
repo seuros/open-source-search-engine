@@ -394,7 +394,7 @@ wbit_t Bits::getPunctuationBits ( char *s , long len ) {
  tryLen3:
 
 	//
-	// i guess just check for ascii spaces now cuz we are lazy
+	// good place to check for ascii spaces...
 	//
 
 	// pair across any number of spaces, it will only show up as one

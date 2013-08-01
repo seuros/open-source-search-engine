@@ -21,6 +21,9 @@ bool loadQueryLog();
 
 long long getSynBaseHash64 ( char *qstr , uint8_t langId ) ;
 
+extern char *g_secret_tran_key;
+extern char *g_secret_api_key;
+
 /*
 class Msg3fRequest {
  public:

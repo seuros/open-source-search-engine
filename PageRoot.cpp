@@ -68,7 +68,7 @@ bool printWebHomePage ( SafeBuf &sb , HttpRequest *r ) {
 	sb.safePrintf("<meta name=\"description\" content=\"A powerful, new search engine that does real-time indexing!\">\n");
 	sb.safePrintf("<meta name=\"keywords\" content=\"search, search engine, search engines, search the web, fresh index, green search engine, green search, clean search engine, clean search\">\n");
 	sb.safePrintf("<title>Gigablast - "
-		      "An Alternative Search Engine</title>\n");
+		      "An Alternative Open Source Search Engine</title>\n");
 	sb.safePrintf("<style><!--\n");
 	sb.safePrintf("body {\n");
 	sb.safePrintf("font-family:Arial, Helvetica, sans-serif;\n");
@@ -123,6 +123,19 @@ bool printWebHomePage ( SafeBuf &sb , HttpRequest *r ) {
 	sb.safePrintf("\n");
 	sb.safePrintf("<table cellpadding=3>\n");
 	sb.safePrintf("\n");
+
+
+	sb.safePrintf("<tr valign=top>\n");
+	sb.safePrintf("<td><div style=width:50px;height:50px;display:inline-block;background-color:red;></td>\n");
+	sb.safePrintf("<td><font size=+1><b>Open Source!</b>"
+	"</font><br>\n");
+	sb.brify2("Gigablast is now available as an <a href=https://github.com/gigablast/open-source-search-engine>open source search engine</a> on github.com. Download it today. Finally a robust, scalable search solution in C/C++ that has been in development and used commercially since 2000. <a href=/admin.html#features>Features.</a> Limited support available for free."
+		  ,80);
+	sb.safePrintf("<br><br>");
+	sb.safePrintf("</td></tr>\n");
+
+
+
 	sb.safePrintf("<tr valign=top>\n");
 	sb.safePrintf("<td><div style=width:50px;height:50px;display:inline-block;background-color:green;></td>\n");
 	sb.safePrintf("<td><font size=+1><b>The Green Search Engine</b></font><br>\n");
@@ -130,9 +143,12 @@ bool printWebHomePage ( SafeBuf &sb , HttpRequest *r ) {
 	sb.safePrintf("<br><br></td></tr>\n");
 	sb.safePrintf("\n");
 	sb.safePrintf("\n");
+
+
+
 	sb.safePrintf("<tr valign=top>\n");
 	sb.safePrintf("<td><div style=width:50px;height:50px;display:inline-block;background-color:0040fe;></td>\n");
-	sb.safePrintf("<td><font size=+1><b>The Open Search Engine</b></font><br>\n");
+	sb.safePrintf("<td><font size=+1><b>The Transparent Search Engine</b></font><br>\n");
 	sb.brify2("Gigablast is the first truly transparent search engine. It tells you exactly why the search results are ranked the way they are. There is nothing left to the imagination.",85);
 	sb.safePrintf("<br><br>");
 	sb.safePrintf("</td></tr>\n");

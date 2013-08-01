@@ -2,6 +2,7 @@
 
 #include "Proxy.h"
 #include "Statsdb.h"
+#include "seo.h" // g_secret_tran_key and api_key
 
 Proxy g_proxy;
 
@@ -3514,13 +3515,15 @@ bool Proxy::hitCreditCard ( StateUser *su ) {
 	//url.safePrintf("&x_card_num=");
 	//url.urlEncode( su->m_ccNum );
 	//
-	// INSERT YOUR secret transaction key for authorize.net
+	// INSERT YOUR secret transaction/api key for authorize.net
 	//
+#ifdef PRIVATESTUFF
+	url.safePrintf("&x_tran_key=%s",g_secret_tran_key);
+	url.safePrintf("&x_login=%s",g_secret_api_key);
+#else
 	url.safePrintf("&x_tran_key=xxxxxxxxxxxxxxx");
-	//
-	// INSERT YOUR secret transaction key login for authorize.net
-	//
 	url.safePrintf("&x_login=yyyyyyyyyy");
+#endif
 
 	// european requires stuff
 	/*

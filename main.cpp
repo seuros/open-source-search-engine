@@ -121,7 +121,7 @@
 //#include  "Diff.h"
 #include "Placedb.h"
 #include "Test.h"
-//#include "seo.h"
+#include "seo.h"
 //#include "Facebook.h"
 //#include "Accessdb.h"
 
@@ -2762,7 +2762,7 @@ int main ( int argc , char *argv[] ) {
 	}
 
 	// the query log split
-#ifdef _SEO_
+#ifdef _PRIVATESTUFF_
 	if ( ! loadQueryLog() ) return 1;
 #endif
 
@@ -3086,7 +3086,7 @@ int main ( int argc , char *argv[] ) {
 		log("db: Failed to init merge sleep callback.");
 
 	// SEO MODULE
-#ifdef _SEO_
+#ifdef _PRIVATESTUFF_
 	if ( ! g_loop.registerSleepCallback(2000,(void *)1,runSEOQueryLoop))
 		log("db: Failed to register seo query loop");
 #endif
@@ -4783,7 +4783,7 @@ bool registerMsgHandlers1(){
 // to make things compile we need to declare this stuff since the seo
 // module is not in the open source version
 //
-#ifndef _SEO_
+#ifndef _PRIVATESTUFF_
 SafeBuf    g_qbuf;
 long       g_qbufNeedSave = false;
 bool sendPageSEO(TcpSocket *, HttpRequest *) {	return true;}
@@ -4815,7 +4815,7 @@ bool registerMsgHandlers2(){
 
 	if ( ! registerHandler4  () ) return false;
 
-#ifdef _SEO_
+#ifdef _PRIVATESTUFF_
 	// seo module handlers
 	if(! g_udpServer.registerHandler(0x8e,handleRequest8e)) return false;
 	if(! g_udpServer.registerHandler(0x4f,handleRequest4f)) return false;

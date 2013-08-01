@@ -372,30 +372,41 @@ bool Hostdb::init ( char *filename , long hostId , char *netName ,
 			while ( is_wspace_a(*p) ) p++;
 		}			
 
+		long port1 = 6000;
+		long port2 = 7000;
+		long port3 = 8000;
+		long port4 = 9000;
+
+		// support old format "000 gk0"
+		if ( p[0] == 'g' && p[1] == 'k' ) goto skip;
+			
+
 		// now the four ports
-		long port1 = atol(p);
+		port1 = atol(p);
 		// skip digits
 		for ( ; is_digit(*p) ; p++ );
 		// skip spaces after it
 		while ( is_wspace_a(*p) ) p++;
 
-		long port2 = atol(p);
+		port2 = atol(p);
 		// skip digits
 		for ( ; is_digit(*p) ; p++ );
 		// skip spaces after it
 		while ( is_wspace_a(*p) ) p++;
 
-		long port3 = atol(p);
+		port3 = atol(p);
 		// skip digits
 		for ( ; is_digit(*p) ; p++ );
 		// skip spaces after it
 		while ( is_wspace_a(*p) ) p++;
 
-		long port4 = atol(p);
+		port4 = atol(p);
 		// skip digits
 		for ( ; is_digit(*p) ; p++ );
 		// skip spaces after it
 		while ( is_wspace_a(*p) ) p++;
+
+	skip:
 
 		// set our ports
 		h->m_dnsClientPort = port1; // 6000
@@ -474,16 +485,28 @@ bool Hostdb::init ( char *filename , long hostId , char *netName ,
 				      is_alnum_a(*p) ; p++ );
 			hlen2 = p - hostname2;
 		}
+		long inc;
+		long ip2;
+		// was it "retired"?
+		if ( strncasecmp(p,"retired",7) == 0 )
+			goto retired;
+		// if no secondary hostname for "gk2" (e.g.) try "gki2"
+		char tmp2[32];
+		if ( ! hostname2 && host[0]=='g' && host[1]=='k') {
+			long hn = atol(host+2);
+			sprintf(tmp2,"gki%li",hn);
+			hostname2 = tmp2;
+		}
 		// limit
 		if ( hlen2 > 15 ) {
 			g_errno = EBADENGINEER;
 			log("admin: hostname too long in hosts.conf");
 			return false;
 		}
-		// a natirual ip?
+		// a direct ip address?
 		memcpy ( h->m_hostname2,hostname2,hlen2);
 		h->m_hostname2[hlen2] = '\0';
-		long ip2 = atoip ( h->m_hostname2 );
+		ip2 = atoip ( h->m_hostname2 );
 		if ( ! ip2 ) {
 			// set this ip
 			//long nextip;
@@ -504,14 +527,15 @@ bool Hostdb::init ( char *filename , long hostId , char *netName ,
 		h->m_ipShotgun = ip2; // nextip;
 		// . "p" should not point to first char after hostname
 		// . a special inc
-		long inc = 0;
+		inc = 0;
 		if ( useTmpCluster ) inc = 1;
 		// proxies never get their port inc'd
 		if ( h->m_type & (HT_ALL_PROXIES) ) inc = 0;
 		// . now p should point to first char after hostname
 		// . skip spaces and tabs
 		while ( *p && (*p==' '|| *p=='\t') )p++;
-		
+
+	retired:		
 		// is "RETIRED" after hostname?
 		if ( strncasecmp(p,"retired",7) == 0 )
 			h->m_retired = true;

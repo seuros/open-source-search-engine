@@ -2,37 +2,6 @@ SHELL = /bin/bash
 
 CC=g++
 
-CHECKFORMATSTRING = -D_CHECK_FORMAT_STRING_
-
-DEFS = -D_REENTRANT_ $(CHECKFORMATSTRING) -I.
-
-HOST=$(shell hostname)
-
-#print_vars:
-#	$(HOST)
-
-# force 32-bit mode using -m32 (apt-get install gcc-multilib to ensure works)
-# and -m32 should use /usr/lib32/ as the library path.
-# for old kernel 2.4 we don't use pthreads, just clone. so if compiling
-# on host "titan" use clone. i still use that. -matt
-# we can only build a 32-bit binary, so we have to use the 32-bit libraries
-# provided for now.
-ifeq ("titan","$(HOST)")
-CPPFLAGS = -DPRIVATESTUFF -m32 -g -Wall -pipe -Wno-write-strings -Wstrict-aliasing=0 -Wno-uninitialized -static	
-LIBS = ./libz.a ./libssl.a ./libcrypto.a ./libiconv.a ./libm.a
-else
-CPPFLAGS = -m32 -g -Wall -pipe -Wno-write-strings -Wstrict-aliasing=0 -Wno-uninitialized -static -D_PTHREADS_ -Wno-unused-but-set-variable
-LIBS= -L. ./libz.a ./libssl.a ./libcrypto.a ./libiconv.a ./libm.a ./libstdc++.a -lpthread 
-endif
-
-
-# let's keep the libraries in the repo for easier bug reporting and debugging
-# in general if we can. the includes are still in /usr/include/ however...
-# which is kinda strange but seems to work so far.
-#LIBS= -L. ./libplotter.a ./libplot.a ./libz.a ./libssl.a ./libcrypto.a ./libiconv.a ./libm.a ./libgcc.a ./libpthread.a ./libc.a ./libstdc++.a 
-
-
-
 OBJS =  Tfndb.o UdpSlot.o \
 	Msg13.o Mime.o IndexReadInfo.o \
 	PageGet.o PageHosts.o PageIndexdb.o PageLogin.o \
@@ -92,6 +61,39 @@ OBJS =  Tfndb.o UdpSlot.o \
 	Dates.o Sections.o SiteGetter.o Syncdb.o \
 	Placedb.o Address.o Test.o GeoIP.o GeoIPCity.o Synonyms.o \
 	Cachedb.o Monitordb.o dlstubs.o
+
+CHECKFORMATSTRING = -D_CHECK_FORMAT_STRING_
+
+DEFS = -D_REENTRANT_ $(CHECKFORMATSTRING) -I.
+
+HOST=$(shell hostname)
+
+#print_vars:
+#	$(HOST)
+
+# force 32-bit mode using -m32 (apt-get install gcc-multilib to ensure works)
+# and -m32 should use /usr/lib32/ as the library path.
+# for old kernel 2.4 we don't use pthreads, just clone. so if compiling
+# on host "titan" use clone. i still use that. -matt
+# we can only build a 32-bit binary, so we have to use the 32-bit libraries
+# provided for now.
+ifeq ("titan","$(HOST)")
+CPPFLAGS = -D_PRIVATESTUFF_ -m32 -g -Wall -pipe -Wno-write-strings -Wstrict-aliasing=0 -Wno-uninitialized -static	
+LIBS = ./libz.a ./libssl.a ./libcrypto.a ./libiconv.a ./libm.a
+OBJS:=$(OBJS) seo.o
+$(shell rm seo.o)
+else
+CPPFLAGS = -m32 -g -Wall -pipe -Wno-write-strings -Wstrict-aliasing=0 -Wno-uninitialized -static -D_PTHREADS_ -Wno-unused-but-set-variable
+LIBS= -L. ./libz.a ./libssl.a ./libcrypto.a ./libiconv.a ./libm.a ./libstdc++.a -lpthread 
+endif
+
+
+# let's keep the libraries in the repo for easier bug reporting and debugging
+# in general if we can. the includes are still in /usr/include/ however...
+# which is kinda strange but seems to work so far.
+#LIBS= -L. ./libplotter.a ./libplot.a ./libz.a ./libssl.a ./libcrypto.a ./libiconv.a ./libm.a ./libgcc.a ./libpthread.a ./libc.a ./libstdc++.a 
+
+
 
 #SRCS := $(OBJS:.o=.cpp) main.cpp
 

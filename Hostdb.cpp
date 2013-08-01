@@ -323,8 +323,13 @@ bool Hostdb::init ( char *filename , long hostId , char *netName ,
 			h->m_type = HT_PROXY;
 			h->m_hostId = proxyNum++;
 		}
+		// ignore old version "port-offset:"
+		else if ( strncasecmp(p,"port-offset:",12)==0 ) {
+			while ( *p && *p != '\n' ) p++;
+			continue;
+		}
 		else {
-			logf(LOG_INFO,"hosts: hosts.conf bad line");
+			logf(LOG_INFO,"hosts: hosts.conf bad line: %s",p);
 			g_errno = EBADENGINEER;
 			return false;
 		}
@@ -372,13 +377,15 @@ bool Hostdb::init ( char *filename , long hostId , char *netName ,
 			while ( is_wspace_a(*p) ) p++;
 		}			
 
-		long port1 = 6000;
-		long port2 = 7000;
-		long port3 = 8000;
-		long port4 = 9000;
+		long port1 = 6002;
+		long port2 = 7002;
+		long port3 = 8002;
+		long port4 = 9002;
 
-		// support old format "000 gk0"
+		// support old format "000 gk0" and use default ports above
 		if ( p[0] == 'g' && p[1] == 'k' ) goto skip;
+		// sp1 is the proxy
+		if ( p[0] == 's' && p[1] == 'p' ) goto skip;
 			
 
 		// now the four ports
@@ -485,11 +492,14 @@ bool Hostdb::init ( char *filename , long hostId , char *netName ,
 				      is_alnum_a(*p) ; p++ );
 			hlen2 = p - hostname2;
 		}
-		long inc;
-		long ip2;
+		long inc = 0;
+		long ip2 = 0;
 		// was it "retired"?
-		if ( strncasecmp(p,"retired",7) == 0 )
-			goto retired;
+		if ( hostname2 && strncasecmp(hostname2,"retired",7) == 0 ) {
+			h->m_retired = true;
+			hostname2 = NULL;
+			//goto retired;
+		}
 		// if no secondary hostname for "gk2" (e.g.) try "gki2"
 		char tmp2[32];
 		if ( ! hostname2 && host[0]=='g' && host[1]=='k') {
@@ -523,6 +533,9 @@ bool Hostdb::init ( char *filename , long hostId , char *netName ,
 				//return false;
 			}
 		}
+		//retired:		
+		// if none, use initial ip as shotgun as well
+		if ( ! ip2 ) ip2 = ip;
 		// store the ip, the eth1 ip
 		h->m_ipShotgun = ip2; // nextip;
 		// . "p" should not point to first char after hostname
@@ -535,7 +548,6 @@ bool Hostdb::init ( char *filename , long hostId , char *netName ,
 		// . skip spaces and tabs
 		while ( *p && (*p==' '|| *p=='\t') )p++;
 
-	retired:		
 		// is "RETIRED" after hostname?
 		if ( strncasecmp(p,"retired",7) == 0 )
 			h->m_retired = true;
@@ -1175,12 +1187,13 @@ bool Hostdb::hashHost (	bool udp , Host *h , uint32_t ip , uint16_t port ) {
 	if ( this == &g_hostdb2 ) hs = "hosts2.conf";
 	if ( this == &g_hostdb  ) hs = "hosts.conf";
 	
-	//logf(LOG_DEBUG,"db: adding ip=%s port=%li udp=%li (%s)",
-	//     iptoa(ip),(long)port,(long)udp,hs);
+	//logf(LOG_INFO,"db: adding %s ip=%s port=%li isUdp=%li",// (%s)",
+	//     h->m_hostname,iptoa(ip),(long)port,(long)udp);//,hs);
 
 	if ( hh && port ) { 
 		log("db: Must hash hosts.conf first, then hosts2.conf.");
 		log("db: or there is a repeated ip/port in hosts.conf.");
+		log("db: repeated host ip=%s name=%s",iptoa(ip),h->m_hostname);
 		return false;//char *xx=NULL;*xx=0;
 	}
 
